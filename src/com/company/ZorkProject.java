@@ -18,6 +18,8 @@ public class ZorkProject {
         maze.createPath();
         Game game = new Game(player, maze);
 
+        so.println("Welcome to the Legend of Zorka!");
+
         while (game.stillPlaying) {
             game.intro();
             String[] instruc = game.inputPlayer();
@@ -70,10 +72,10 @@ class Game {
         else if (word_list[0].equalsIgnoreCase("Help")) { help(); }
         else if (word_list[0].equalsIgnoreCase("Move") || word_list[0].equalsIgnoreCase("Go")
                 || word_list[0].equalsIgnoreCase("Walk") || word_list[0].equalsIgnoreCase("Run")) { moving(word_list); }
-        if(word_list[0].equalsIgnoreCase("North")) { north(); }
-        else if (word_list[0].equalsIgnoreCase("South")) { south(); }
-        else if (word_list[0].equalsIgnoreCase("East")) { east(); }
-        else if (word_list[0].equalsIgnoreCase("West")) { west(); }
+        else if (word_list[0].equalsIgnoreCase("North") || word_list[0].equalsIgnoreCase("Forward")) { north(); }
+        else if (word_list[0].equalsIgnoreCase("South") || word_list[0].equalsIgnoreCase("Backward")) { south(); }
+        else if (word_list[0].equalsIgnoreCase("East") || word_list[0].equalsIgnoreCase("Right")) { east(); }
+        else if (word_list[0].equalsIgnoreCase("West") || word_list[0].equalsIgnoreCase("Left")) { west(); }
         else if (word_list[0].equalsIgnoreCase("Up")) { up(); }
         else if (word_list[0].equalsIgnoreCase("Down")) { down(); }
         else if (word_list[0].equalsIgnoreCase("Quit")) {
@@ -107,7 +109,7 @@ class Game {
         for (int i = 1; i < word_list.length; i++) {}
     }
     public void putIn(String[] word_list) {
-        if( word_list.length ==1 ) {
+        if( word_list.length == 1 ) {
             so.println("And put what?");
         }
         else if (word_list.length == 2) {
@@ -124,60 +126,56 @@ class Game {
             so.println("Do you even know where you're going?");
         }
         else {
-            if (word_list[1].equalsIgnoreCase("North") || word_list[1].equalsIgnoreCase("Forward")) {
-                north();
-            } else if (word_list[1].equalsIgnoreCase("South") || word_list[1].equalsIgnoreCase("Backward")) {
-                south();
-            } else if (word_list[1].equalsIgnoreCase("East") || word_list[1].equalsIgnoreCase("Right")) {
-                east();
-            } else if (word_list[1].equalsIgnoreCase("West") || word_list[1].equalsIgnoreCase("Left")) {
-                west();
-            } else if (word_list[1].equalsIgnoreCase("Up")) {
-                up();
-            } else if (word_list[1].equalsIgnoreCase("Down")) {
-                down();
-            } else {
+            if (word_list[1].equalsIgnoreCase("North") || word_list[1].equalsIgnoreCase("Forward")) { north(); }
+            else if (word_list[1].equalsIgnoreCase("South") || word_list[1].equalsIgnoreCase("Backward")) { south(); }
+            else if (word_list[1].equalsIgnoreCase("East") || word_list[1].equalsIgnoreCase("Right")) { east(); }
+            else if (word_list[1].equalsIgnoreCase("West") || word_list[1].equalsIgnoreCase("Left")) { west(); }
+            else if (word_list[1].equalsIgnoreCase("Up")) { up(); }
+            else if (word_list[1].equalsIgnoreCase("Down")) { down(); }
+            else {
                 so.println("Let's face it. You're lost.");
             }
         }
     }
 
     public void north() {
-        if(current.north.isWall()){ current.wall(); }
+        if(current.north.isWall()) { current.wall(); }
+        else if(!current.north.passable()) { so.println("That's locked!"); }
         else {
             current = current.north.next;
         }
     }
     public void south() {
-        if(current.south.isWall()){ current.wall(); }
+        if(current.south.isWall()) { current.wall(); }
+        else if(!current.south.passable()) { so.println("That's locked!"); }
         else {
             current = current.south.next;
         }
     }
     public void east() {
         if(current.east.isWall()){ current.wall(); }
+        else if(!current.east.passable()) { so.println("That's locked!"); }
         else {
             current = current.east.next;
         }
     }
     public void west() {
         if(current.west.isWall()){ current.wall(); }
+        else if(!current.west.passable()) { so.println("That's locked!"); }
         else {
             current = current.west.next;
         }
     }
     public void down() {
-        if(current.down.isWall()){
-            so.println("Unless you're a mole, you can't burrow underground.");
-        }
+        if(current.down.isWall()){ so.println("Unless you're a mole, you can't burrow underground."); }
+        else if(!current.down.passable()) { so.println("That's locked!"); }
         else {
             current = current.down.next;
         }
     }
     public void up() {
-        if(current.up.isWall()){
-            so.println("If you somehow managed to grow wings, then maybe you could fly.");
-        }
+        if(current.up.isWall()){ so.println("If you somehow managed to grow wings, then maybe you could fly."); }
+        else if(!current.up.passable()) { so.println("That's locked!"); }
         else {
             current = current.down.next;
         }
@@ -299,6 +297,7 @@ class Side {
     Side(){ wall = true; }
 
     public boolean isWall() { return wall; }
+    public boolean passable() { return traverse; }
 }
 
 class Door extends Side {

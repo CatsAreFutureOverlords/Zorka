@@ -1,6 +1,5 @@
 package com.company;
 
-import javax.crypto.spec.IvParameterSpec;
 import java.io.PrintStream;
 import java.util.Scanner;
 import static com.company.ZorkProject.so;
@@ -19,26 +18,30 @@ public class ZorkProject {
         maze.createPath();
         Game game = new Game(player, maze);
 
-        so.println("Welcome to the Legend of Zorka!");
+        so.println("\nWelcome to the Legend of Zorka!\n");
+
+        so.println("Darkness plagues the land ever since the villainous Qanon cast his unholy magic.");
+        so.println("Now he dwells in the depths of the abandoned Highrule Castle. Defeat Qanon and bring back Light to world!");
+        so.println("But beware the monsters that lurk about the Castle. They can only be killed by particular weapons.");
+        so.println("Use the wrong weapon and the results are fatal.");
+        so.println("Best of luck to you, Hero.....");
 
         while (game.stillPlaying) {
             game.intro();
+            game.current.radioactive(player);
             game.current.optional();
             String[] instruc = game.inputPlayer();
             game.parsing(instruc);
             game.update();
         }
 
-        if(!player.health) {
-            so.println("You died..... Game Over!");
-        }
+        if(!player.health) { so.println("You died..... Game Over!"); }
         else if (maze.victory) {
             so.println("You defeated the evil plaguing the land!");
-            so.println("All Hail the new Hero!");
+            so.println("All Hail the our Hero and Saviour!\n");
+            so.printf("You took %d turns to reach the end. See if you can finish in less.\n", player.score);
         }
-
         so.println("Thank you for playing!");
-
     }
 }
 
@@ -55,7 +58,7 @@ class Game {
     }
 
     public void intro() {
-        so.printf("\nAction Score: %d\n", player1.score);
+        so.printf("\nAction Points: %d\n", player1.score);
         so.printf("\n%s\n", current.getName());
         so.printf("%s\n", current.getDescrip());
     }
@@ -78,13 +81,15 @@ class Game {
         { take(word_list); }
         else if (word_list[0].equalsIgnoreCase("Drop"))
         { drop(word_list); }
-        else if (word_list[0].equalsIgnoreCase("Put")) { putIn(word_list); }
         else if (word_list[0].equalsIgnoreCase("Inventory"))
         { invenChk(); }
-        else if (word_list[0].equalsIgnoreCase("Help")) { help(); }
+        else if (word_list[0].equalsIgnoreCase("Help"))
+        { help(); }
         else if (word_list[0].equalsIgnoreCase("Survey"))
         { survey(); }
-        else if(word_list[0].equalsIgnoreCase("Talk") || word_list[0].equalsIgnoreCase("Speak")) { speak(); }
+        else if(word_list[0].equalsIgnoreCase("Talk") || word_list[0].equalsIgnoreCase("Speak")
+                || word_list[0].equalsIgnoreCase("Yell"))
+        { speak(); }
         else if (word_list[0].equalsIgnoreCase("Move") || word_list[0].equalsIgnoreCase("Go")
                 || word_list[0].equalsIgnoreCase("Walk") || word_list[0].equalsIgnoreCase("Run"))
         { moving(word_list); }
@@ -100,7 +105,8 @@ class Game {
         { up(); }
         else if (word_list[0].equalsIgnoreCase("Down"))
         { down(); }
-        else if (word_list[0].equalsIgnoreCase("Quit") || word_list[0].equalsIgnoreCase("End")) {
+        else if (word_list[0].equalsIgnoreCase("Quit") || word_list[0].equalsIgnoreCase("End")
+                || word_list[0].equalsIgnoreCase("Exit")) {
             so.println("The game will end now.");
             stillPlaying = false;
         }
@@ -115,7 +121,7 @@ class Game {
             so.printf("And just how are you going to fight %s?\n", word_list[1]);
         }
         else if(!word_list[2].equalsIgnoreCase("with")) {
-            so.println("The pen is mighter than the sword, so is grammar when trying to attack.");
+            so.println("The pen is mightier than the sword, so is grammar when trying to attack.");
         }
         else if (word_list.length == 3 ) {
             so.println("Are you planning on fighting unarmed?");
@@ -230,16 +236,10 @@ class Game {
             }
         }
     }
-    public void putIn(String[] word_list) {
-        if( word_list.length == 1 ) {
-            so.println("And put what?");
-        }
-        else if (word_list.length == 2) {
-            so.println("And where?");
-        }
-        else {}
+
+    public void speak() {
+        so.println("HYAAAAAAAAAAAAAAA!!!!");
     }
-    public void speak() {}
 
     public void survey() {
         if(current.interact < 1){
@@ -257,17 +257,24 @@ class Game {
             so.println("You only have the clothes on your back and nothing else.");
         }
         else {
-            for (int i = 0; i < player1.possess; i++) {
-                player1.holding[i].display();
-            }
+            for (int i = 0; i < player1.possess; i++) { player1.holding[i].display(); }
         }
     }
-    public void help() {}
+    public void help() {
+        so.println("\nCommand List:\n");
+        so.println("To move - walk/run/go/move\nDirections - north/south/east/west/up/down");
+        so.println("yell - try it and see what happens");
+        so.println("survey - get descriptions of all the items in the room");
+        so.println("inventory - show all the items you are currently holding");
+        so.println("To look at description of an item - look/see/examine [item]");
+        so.println("To pick up items - take [item] or take all");
+        so.println("To remove items from bag - drop [item] or drop all");
+        so.println("To fight monsters - fight/kill/attack [monster] with [weapon]");
+        so.println("To end the game - end/exit/quit");
+    }
 
     public void moving(String[] word_list) {
-        if(word_list.length == 1) {
-            so.println("Do you even know where you're going?");
-        }
+        if(word_list.length == 1) { so.println("Do you even know where you're going?"); }
         else {
             if (word_list[1].equalsIgnoreCase("North") || word_list[1].equalsIgnoreCase("Forward")) { north(); }
             else if (word_list[1].equalsIgnoreCase("South") || word_list[1].equalsIgnoreCase("Back")) { south(); }
@@ -275,9 +282,7 @@ class Game {
             else if (word_list[1].equalsIgnoreCase("West") || word_list[1].equalsIgnoreCase("Left")) { west(); }
             else if (word_list[1].equalsIgnoreCase("Up")) { up(); }
             else if (word_list[1].equalsIgnoreCase("Down")) { down(); }
-            else {
-                so.println("Let's face it. You're lost.");
-            }
+            else { so.println("Let's face it. You're lost."); }
         }
     }
 
@@ -285,47 +290,35 @@ class Game {
         if(current.north.isWall()) { current.wall(); }
         else if(current.north.isLock()) { so.println("That's locked!"); }
         else if(!current.north.passable()) { so.println("You can't get through!"); }
-        else {
-            current = current.north.next;
-        }
+        else { current = current.north.next; }
     }
     public void south() {
         if(current.south.isWall()) { current.wall(); }
         else if(current.south.isLock()) { so.println("That's locked!"); }
         else if(!current.south.passable()) { so.println("You can't get through!"); }
-        else {
-            current = current.south.next;
-        }
+        else { current = current.south.next; }
     }
     public void east() {
         if(current.east.isWall()){ current.wall(); }
         else if(current.east.isLock()) { so.println("That's locked!"); }
         else if(!current.east.passable()) { so.println("You can't get through!"); }
-        else {
-            current = current.east.next;
-        }
+        else { current = current.east.next; }
     }
     public void west() {
         if(current.west.isWall()){ current.wall(); }
         else if(current.west.isLock()) { so.println("That's locked!"); }
         else if(!current.west.passable()) { so.println("You can't get through!"); }
-        else {
-            current = current.west.next;
-        }
+        else { current = current.west.next; }
     }
     public void down() {
         if(current.down.isWall()){ so.println("Unless you're a mole, you can't burrow underground."); }
         else if(current.down.isLock()) { so.println("That's locked!"); }
-        else {
-            current = current.down.next;
-        }
+        else { current = current.down.next; }
     }
     public void up() {
         if(current.up.isWall()){ so.println("If you somehow managed to grow wings, then maybe you could fly."); }
         else if(current.up.isLock()) { so.println("That's locked!"); }
-        else {
-            current = current.down.next;
-        }
+        else { current = current.down.next; }
     }
 
     public void update() {
@@ -335,7 +328,7 @@ class Game {
 }
 
 class Player {
-    final int carrycap = 50;
+    final int carrycap = 55;
     public int strength;
     public boolean health;
     public int score;
@@ -351,9 +344,7 @@ class Player {
     }
 
     public void add(Inventory newItem) {
-        if (newItem.weight > strength) {
-            so.println("You can't carry this much stuff!");
-        }
+        if (newItem.weight > strength) { so.println("You can't carry this much stuff!"); }
         else {
             holding[possess] = newItem;
             possess += 1;
@@ -364,9 +355,7 @@ class Player {
 
     public boolean inBag(String searching) {
         for(int i = 0; i < possess; i++) {
-            if(searching.equalsIgnoreCase(holding[i].name)){
-                return true;
-            }
+            if(searching.equalsIgnoreCase(holding[i].name)){ return true; }
         }
         return false;
     }
@@ -389,9 +378,7 @@ class Player {
                 so.printf("%s was thrown away.", holding[i].getName());
                 temp = holding[i];
                 strength += holding[i].weight;
-                for(int j = i; j < possess; j++) {
-                    holding[j] = holding[j+1];
-                }
+                for(int j = i; j < possess; j++) { holding[j] = holding[j+1]; }
                 possess -= 1;
                 return temp;
             }
@@ -525,33 +512,31 @@ class Door extends Side {
 }
 
 class Locked extends Door {
-    Locked(Room next) {
+    Inventory unlock;
+
+    Locked(Room next, Inventory unlock) {
         super(next);
+        this.unlock = unlock;
         closed = true;
         traverse = false;
-    }
-
-    public void condition() {
-        closed = false;
-        traverse = true;
     }
 }
 
 class PathFactory {
     public Side createWall() { return new Side(); }
     public Door createDoor(Room room) { return new Door(room); }
-    public Locked createLock(Room room) { return new Locked(room); }
+    public Locked createLock(Room room, Inventory unlock) { return new Locked(room, unlock); }
 
     public Kiise spawnKiise() { return new Kiise(); }
     public Octostone spawnOcto() { return new Octostone(); }
+    public Ryenel spawnRye() {return new Ryenel();}
+    public Moldugger spawnMold() {return new Moldugger();}
+    public Heenocks spawnHeen() {return new Heenocks();}
     public Qanon spawnQanon() { return new Qanon(); }
 
     public SilverKey silverKey() { return new SilverKey(); }
     public DungeonKey dungeonKey() { return new DungeonKey(); }
-    public QuadFire quadFire() { return new QuadFire(); }
-    public QuadEarth quadEarth() { return new QuadEarth(); }
-    public QuadAir quadAir() { return new QuadAir(); }
-    public QuadWater quadWater() { return new QuadWater(); }
+    public QuadForce quadForce() {return new QuadForce();}
 
     public WoodBlade woodBlade() { return new WoodBlade(); }
     public MisterSword misterSword() { return new MisterSword(); }
@@ -559,11 +544,13 @@ class PathFactory {
     public Bombs bombs() { return new Bombs(); }
     public WoodShield woodShield() { return new WoodShield(); }
     public HighShield highShield() { return new HighShield(); }
+    public Bow bow() {return new Bow();}
 
     public Hermit spawnHermit() { return new Hermit(); }
     public Painting spwnPaint() { return new Painting(); }
-    public Boulder spwnBoulder() { return new Boulder(); }
     public Case spnCase() { return new Case(); }
+    public Brazier spnBraz() { return new Brazier(); }
+    public Fountain spnFount() { return new Fountain(); }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------
@@ -573,20 +560,12 @@ abstract class Obstacle {
     public String desc;
     boolean canFight;
 
+    Obstacle() { canFight = false; }
+
     public void display() {
         so.printf("%s - %s\n", getName(), desc);
     }
-
     public String getName() { return name; }
-    public String toString() { return getName(); }
-}
-
-class Container extends Obstacle {
-    Inventory[] holds;
-
-    Container() {
-        holds = new Inventory[5];
-    }
 }
 
 class Inventory extends Obstacle {
@@ -631,9 +610,9 @@ abstract class Room {
     public Side up;
     public Side down;
 
-    Inventory[] onFloor = {};
+    Inventory[] onFloor;
     public int itemNum;
-    Obstacle[] inRoom = {};
+    Obstacle[] inRoom;
     public int interact;
     PathFactory direction;
 
@@ -656,28 +635,23 @@ abstract class Room {
     public String toString() {
         String temp = onFloor[0].getName();
 
-        if(itemNum == 2){
-            temp = temp.concat(" and ").concat(onFloor[1].getName());
-        }
+        if(itemNum == 2){ temp = temp.concat(" and ").concat(onFloor[1].getName()); }
         else if(itemNum >= 3) {
             for(int i = 1; i < itemNum - 1; i++) {
                 temp = temp.concat(", ");
                 temp = temp.concat(onFloor[i].getName());
             }
-            temp.concat(", and ").concat(onFloor[itemNum-1].getName());
+            temp = temp.concat(", and ").concat(onFloor[itemNum-1].getName());
         }
-
         return temp;
     }
 
     public void optional() {
-        if(itemNum == 1) {
-            so.printf("A %s is just laying there on the ground.\n", this);
-        }
-        else if (itemNum > 1){
-            so.printf("%s litter the floor.\n", this);
-        }
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
     }
+
+    public void radioactive(Player player) {}
 
     public void addBckgrnd(Obstacle anoth) {
         inRoom[interact] = anoth;
@@ -692,27 +666,21 @@ abstract class Room {
 
     public boolean ifThere(String search){
         for(int i = 0; i < interact; i++) {
-            if(search.equalsIgnoreCase(inRoom[i].name)) {
-                return true;
-            }
+            if(search.equalsIgnoreCase(inRoom[i].name)) { return true; }
         }
         return false;
     }
 
     public boolean anItem(String search) {
         for(int i = 0; i < itemNum; i++) {
-            if(search.equalsIgnoreCase(onFloor[i].name)) {
-                return true;
-            }
+            if(search.equalsIgnoreCase(onFloor[i].name)) { return true; }
         }
         return false;
     }
 
     public Inventory foundIt(String finding) {
         for(int i = 0; i < itemNum; i++) {
-            if(finding.equalsIgnoreCase(onFloor[i].name)) {
-                return onFloor[i];
-            }
+            if(finding.equalsIgnoreCase(onFloor[i].name)) { return onFloor[i]; }
         }
         return null;
     }
@@ -720,18 +688,14 @@ abstract class Room {
     public void takeFrom(String remove) {
         for(int i = 0; i < interact; i++){
             if(remove.equalsIgnoreCase(inRoom[i].name)){
-                for(int j = i; j < interact; j++) {
-                    inRoom[j] = inRoom[j+1];
-                }
+                for(int j = i; j < interact; j++) { inRoom[j] = inRoom[j+1]; }
                 interact -= 1;
                 break;
             }
         }
         for (int k = 0; k < itemNum; k++) {
             if(remove.equalsIgnoreCase(onFloor[k].name)) {
-                for(int l = k; l < itemNum; l++) {
-                    onFloor[l] = onFloor[l+1];
-                }
+                for(int l = k; l < itemNum; l++) { onFloor[l] = onFloor[l+1]; }
                 itemNum -= 1;
                 break;
             }
@@ -772,42 +736,15 @@ class SilverKey extends Inventory {
     SilverKey() {
         name = "Key";
         desc = "A key made of pure silver. It should open a door somewhere.";
+        weight = 0;
     }
 }
 
 class DungeonKey extends Inventory{
     DungeonKey() {
-        name = "Dungeon";
-        desc = "A rather ominous looking key. It probably fits a special looking door.";
-    }
-    public String getName() { return "Dungeon Key"; }
-}
-
-class QuadFire extends Inventory{
-    QuadFire(){
-        name = "QuadFire";
-        desc = "A fragment of the QuadForce; this one is embued with the power of red flames.";
-    }
-}
-
-class QuadEarth extends Inventory{
-    QuadEarth() {
-        name = "QuadEarth";
-        desc = "A fragment of the QuadForce; this one is embued with the power of yellow dirt.";
-    }
-}
-
-class QuadWater extends Inventory{
-    QuadWater() {
-        name = "QuadWater";
-        desc = "A fragment of the QuadForce; this one is embued with the power of blue liquid.";
-    }
-}
-
-class QuadAir extends Inventory{
-    QuadAir() {
-        name = "QuadAir";
-        desc = "A fragment of the QuadForce; this one is embued with the power of green wind.";
+        name = "Talisman";
+        desc = "A piece of paper said to dispel dark forces.";
+        weight = 0;
     }
 }
 
@@ -826,7 +763,7 @@ class WoodBlade extends Weaponry {
 class MisterSword extends Weaponry {
     MisterSword() {
         name = "Mister";
-        desc = "This Sword shows your status as the Chosen Hero.";
+        desc = "This Sword shows your status as the Chosen Hero. You will need it to fight the darkness.";
         weight = 25;
     }
 
@@ -836,7 +773,7 @@ class MisterSword extends Weaponry {
 class FireRod extends Weaponry {
     FireRod() {
         name = "Flame";
-        desc = "Allows you to summon a flame to light your way.";
+        desc = "Allows you to summon forth an intense flame, capable of burning everything in its path.";
         weight = 15;
     }
 
@@ -845,9 +782,17 @@ class FireRod extends Weaponry {
 
 class Bombs extends Weaponry {
     Bombs() {
-        name = "Bombs";
-        desc = "These explosive bombs can really pack a punch.";
+        name = "Grenade";
+        desc = "This explosive device can really pack a punch.";
         weight = 20;
+    }
+}
+
+class Bow extends Weaponry {
+    Bow() {
+        name = "Bow";
+        desc = "You can shoot an arrow at a target far away";
+        weight = 15;
     }
 }
 
@@ -872,7 +817,7 @@ class HighShield extends Weaponry {
 class QuadForce extends Weaponry {
     QuadForce() {
         name = "QuadForce";
-        desc = "The ultimate embodiment of the Forces of Light.";
+        desc = "The ultimate embodiment of the Forces of Light. It is the only Power strong enough to seal away the darkness forever.";
         weight = 0;
     }
 }
@@ -886,40 +831,31 @@ class Hermit extends Obstacle {
     }
 }
 
-class Boulder extends Enemies {
-    Boulder() {
-        weakness = new Bombs();
-        name = "Boulder";
-        desc = "A gigantic piece of rubble. There may be something underneath.";
-        alive = true;
-    }
-
-    public boolean crit(String weapon) {
-        if(weakness.name.equals(weapon)) {
-            killed();
-            so.println("The giant boulder was reduced to dust!");
-            return true;
-        }
-        else {
-            so.println("The heavy rock refuses to budge!");
-            return false;
-        }
-    }
-}
-
-class Painting extends Container {
+class Painting extends Obstacle {
     Painting() {
         name = "Painting";
         desc = "It appears to be some sort of abstract portrait.";
-        holds = new Inventory[1];
     }
 }
 
-class Case extends Container {
+class Case extends Obstacle {
     Case() {
         name = "Case";
         desc = "A decorative glass Case for decorational purposes.";
-        holds = new Inventory[3];
+    }
+}
+
+class Brazier extends Obstacle {
+    Brazier(){
+        name = "Brazier";
+        desc = "Somehow, its embers are still warm.";
+    }
+}
+
+class Fountain extends Obstacle{
+    Fountain(){
+        name = "Fountain";
+        desc = "There's clear water flowing through it";
     }
 }
 
@@ -930,7 +866,7 @@ class Kiise extends Enemies {
         super();
         weakness = new WoodBlade();
         name = "Kiise";
-        desc = "They're rather quick creatures, try swatting them with a melee weapon.";
+        desc = "They're rather quick creatures, try swatting them with a fast melee weapon.";
     }
 
     public boolean crit(String weapon) {
@@ -951,7 +887,7 @@ class Octostone extends Enemies {
         super();
         weakness = new WoodShield();
         name = "Octostone";
-        desc = "It is weak to its own attack, utilise that information.";
+        desc = "It is weak to its own attack, use something to deflect it.";
     }
 
     public boolean crit(String weapon) {
@@ -962,6 +898,71 @@ class Octostone extends Enemies {
         }
         else {
             so.println("The Octostone shoots a fatal projectile, striking you in the head.");
+            return false;
+        }
+    }
+}
+
+class Heenocks extends Enemies {
+    Heenocks() {
+        super();
+        weakness = new Bow();
+        name = "Heenocks";
+        desc = "A giant cyclops holding a heavy mace; it would be best to defeat it from a distance.";
+    }
+
+    public boolean crit(String weapon) {
+        if (weakness.name.equals(weapon)) {
+            killed();
+            so.println("Your aim struck true!\n The Heenocks falls with a loud thud!");
+            return true;
+        }
+        else {
+            so.println("You are crushed by the Heenocks' giant mace!");
+            return false;
+        }
+    }
+}
+
+class Moldugger extends Enemies {
+    Moldugger() {
+        super();
+        weakness = new Bombs();
+        name = "Moldugger";
+        desc = "This giant worm is relatively safe from melee weapons as it burrows underground. "
+                + "Use something more explosive to defeat it.";
+    }
+
+    public boolean crit(String weapon) {
+        if (weakness.name.equals(weapon)) {
+            killed();
+            so.println("The Moldugger is blown to smithereens!");
+            return true;
+        }
+        else {
+            so.println("The Moldugger drags you underground.");
+            return false;
+        }
+    }
+}
+
+class Ryenel extends Enemies {
+    Ryenel() {
+        super();
+        weakness = new FireRod();
+        name = "Ryenel";
+        desc = "A centaurian creature with a lion top half and a horse bottom half. Its thick pelt protects it from the cold."
+                + "Try attack it with high heat.";
+    }
+
+    public boolean crit(String weapon) {
+        if (weakness.name.equals(weapon)) {
+            killed();
+            so.println("There is nothing left of the Ryenel but a charred corpse.");
+            return true;
+        }
+        else {
+            so.println("The Ryenel charges at you full force, crushing you underneath its powerful hooves.");
             return false;
         }
     }
@@ -979,7 +980,7 @@ class Qanon extends Enemies{
         secForm = true;
         firstForm = true;
         name = "Qanon";
-        desc = "Your one true Enemy";
+        desc = "Your one true Enemy.";
     }
 
     public boolean crit(String weapon) {
@@ -990,11 +991,11 @@ class Qanon extends Enemies{
             }
             else if (secForm) {
                 secForm = false;
-                so.println("The pig-like monstrosity lets out its final squeal!");
+                so.println("The pig-like monstrosity is crushed against the indestructible Shield and lets out its final squeal!");
             }
             else {
                 killed();
-                so.println("The dark miasma finally dissipates.");
+                so.println("The dark miasma is absorbed into the QuadForce and dissipates.\n");
             }
             return true;
         }
@@ -1016,6 +1017,7 @@ class Room1 extends Room {
         descrip = "The room is ornately decorated. A large Painting hangs on the wall.\n" + "The only exit is to the North.";
         painting = direction.spwnPaint();
         addBckgrnd(painting);
+        throwFloor(direction.dungeonKey());
     }
 
     public void wall() { so.println("There is no way through the thick stone wall."); }
@@ -1049,6 +1051,7 @@ class Room3 extends Room {
         super(direction);
         name = "Narrow Path";
         descrip = "You’re in a tight passageway that goes North and South. It is a rather tight squeeze.";
+        throwFloor(direction.bow());
     }
 
     public void wall() { so.println("There isn't even enough room to turn in any direction."); }
@@ -1061,10 +1064,20 @@ class Room3 extends Room {
 }
 
 class Room4 extends Room {
+    Ryenel ryenel;
+
     Room4(PathFactory direction) {
         super(direction);
         name = "Balcony";
         descrip = "You’re standing on a high balcony where falling off the edges ensures certain death. There is a constant breeze at all times.\n" + "The only door leads East.";
+        ryenel = direction.spawnRye();
+        addBckgrnd(ryenel);
+    }
+
+    public void optional() {
+        if(ryenel.alive){ so.println("There is a vicious Ryenel stalking the room."); }
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
     }
 
     public void wall() { so.println("You will fall to your death off this balcony!"); }
@@ -1117,6 +1130,7 @@ class Room7 extends Room {
         super(direction);
         name = "Fountain Room";
         descrip = "A water Fountain sits at the centre of the room.\n"+ "The room opens up in the East, West, and North directions.";
+        addBckgrnd(direction.spnFount());
     }
 
     public void wall() { so.println("That's a steep waterfall!"); }
@@ -1130,7 +1144,7 @@ class Room7 extends Room {
 }
 
 class Room8 extends Room {
-    Boulder boulder;
+    Moldugger moldugger;
 
     Room8(PathFactory direction) {
         super(direction);
@@ -1138,21 +1152,14 @@ class Room8 extends Room {
         descrip = "Back when there were still people, this would have been where they stored food and ingredients.\n"
                 + "Now it is in a state of disarray with debris everywhere.\n"
                 + "The entrance and exit are North and South.";
-        boulder = direction.spwnBoulder();
-        addBckgrnd(boulder);
+        moldugger = direction.spawnMold();
+        addBckgrnd(moldugger);
     }
 
     public void optional() {
-        if(boulder.alive) {
-            so.println("A massive boulder just block the middle of the room.");
-        }
-
-        if(itemNum == 1) {
-            so.printf("A %s is just laying there on the ground.\n", toString());
-        }
-        else if (itemNum > 1){
-            so.printf("%s litter the floor.\n", toString());
-        }
+        if(moldugger.alive) { so.println("You can hear the sounds of the Moldugger burrowing beneath the room."); }
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
     }
 
     public void wall() { so.println("The boulders will collapse and crush you."); }
@@ -1220,6 +1227,9 @@ class Room11 extends Room {
             north.traverse = true;
             west.traverse = true;
         }
+
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
     }
 
     public void wall() {so.println("You can't go this way.");}
@@ -1234,11 +1244,26 @@ class Room11 extends Room {
 }
 
 class Room12 extends Room {
+    Heenocks heenocks;
+    Ryenel ryenel;
+    Moldugger moldugger;
+
     Room12(PathFactory direction) {
         super(direction);
         name = "Room of the Hero";
         descrip = "Something about the room just calls out to you.\n" +
                 "You can only proceed East or South.";
+        throwFloor(direction.misterSword());
+    }
+
+    public void optional() {
+
+        if(moldugger.alive || ryenel.alive || heenocks.alive) {
+            east.traverse = false;
+            so.println("A mysterious force seals away the East wall. Prove your mettle and it just may open.");
+        }
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
     }
 
     public void wall() { so.println("You can't go through the thick walls."); }
@@ -1247,6 +1272,9 @@ class Room12 extends Room {
                         Room15 room15, Room16 room16, Room17 room17, Room18 room18, Room19 room19, Room20 room20, BossRoom boss) {
         south = direction.createDoor(room11);
         east = direction.createDoor(room13);
+        heenocks = room16.heenocks;
+        ryenel = room4.ryenel;
+        moldugger = room8.moldugger;
     }
 }
 
@@ -1256,6 +1284,7 @@ class Room13 extends Room {
         name = "Shrine of the Goddess";
         descrip = "You’re standing in what looks like a shrine. You can feel an ethereal power emanating from every corner of the room.\n" +
                 "The only way out is West.";
+        throwFloor(direction.quadForce());
     }
 
     public void wall() { so.println("A dense forest blocks your way."); }
@@ -1281,12 +1310,8 @@ class Room14 extends Room {
             so.println("The Highlian Shield hangs precariously on the wall. It could fall at any moment.");
         }
 
-        if(itemNum == 1 && entry > 0) {
-            so.printf("A %s is just laying there on the ground.\n", this);
-        }
-        else if (itemNum > 1){
-            so.printf("%s litter the floor.\n", this);
-        }
+        if(itemNum == 1 && entry > 0) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
 
         entry += 1;
     }
@@ -1321,11 +1346,9 @@ class Room15 extends Room {
             north.traverse = true;
             east.traverse = true;
         }
-        if(itemNum == 1) {
-            so.printf("A %s is just laying there on the ground.\n", toString());
-        }
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
         else if (itemNum > 1){
-            so.printf("%s litter the floor.", toString());
+            so.printf("%s litter the floor.\n", this);
         }
     }
 
@@ -1341,41 +1364,64 @@ class Room15 extends Room {
 }
 
 class Room16 extends Room {
+    Heenocks heenocks;
+
     Room16(PathFactory direction) {
         super(direction);
         name = "Hearth";
         descrip = "A golden Brazier warms the entire room.\n" + "The only entrance is West.";
+        heenocks = direction.spawnHeen();
+        addBckgrnd(heenocks);
+        addBckgrnd(direction.spnBraz());
+    }
+
+    public void optional() {
+        if(heenocks.alive) { so.println("The Heenocks glares at you with its single eye, hefting its club."); }
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.\n", this); }
     }
 
     public void wall() { so.println("You can't touch the flaming hot stones."); }
     public void pathway(Room1 room1, Room2 room2, Room3 room3, Room4 room4, Room5 room5, Room6 room6, Room7 room7,
                         Room8 room8, Room9 room9, Room10 room10, Room11 room11, Room12 room12, Room13 room13, Room14 room14,
                         Room15 room15, Room16 room16, Room17 room17, Room18 room18, Room19 room19, Room20 room20, BossRoom boss) {
-        west = direction.createLock(room17);
+        west = direction.createDoor(room17);
     }
 }
 
 class Room17 extends Room {
     Case glssCase;
+
     Room17(PathFactory direction) {
         super(direction);
         name = "Trophy Room";
         descrip = "Priceless relics line the room. Some rest in a glass Case.\n" + "There are doors in every direction: North, East, South, West.";
         glssCase = direction.spnCase();
         addBckgrnd(glssCase);
-        glssCase.holds[0] = direction.fireRod();
+        throwFloor(direction.fireRod());
+    }
+
+    public void radioactive(Player player){
+        Locked plcehldr = (Locked) east;
+        for(int i = 0; i < player.possess; i++){
+            if(player.holding[i].name == plcehldr.unlock.name){
+                east.traverse = true;
+                east.closed = false;
+                break;
+            }
+            else {
+                east.traverse = false;
+                east.closed = true;
+            }
+        }
     }
 
     public void optional() {
-        if(east.closed){
-            so.println("It appears that the East side door remains firmly locked.");
-        }
-        if(itemNum == 1) {
-            so.printf("A %s is just laying there on the ground.\n", toString());
-        }
-        else if (itemNum > 1){
-            so.printf("%s litter the floor.", toString());
-        }
+        if(east.closed){ so.println("It appears that the East side door remains firmly locked."); }
+        else{ so.println("Your Key is reacting with the Eastern door. It is opening."); }
+
+        if(itemNum == 1) { so.printf("A %s is just laying there on the ground.\n", this); }
+        else if (itemNum > 1){ so.printf("%s litter the floor.", this); }
     }
 
     public void wall() {so.println("You can't go this way.");}
@@ -1384,7 +1430,7 @@ class Room17 extends Room {
                         Room15 room15, Room16 room16, Room17 room17, Room18 room18, Room19 room19, Room20 room20, BossRoom boss) {
         north = direction.createDoor(room15);
         south = direction.createDoor(room18);
-        east = direction.createLock(room16);
+        east = direction.createLock(room16, direction.silverKey());
         west = direction.createDoor(room20);
     }
 }
@@ -1398,6 +1444,7 @@ class Room18 extends Room {
         descrip = "At the centre of the room, a Hermit in robes just stands there, menacingly.\n" + "The cave opens up to the North, East, and West.";
         hermit = direction.spawnHermit();
         addBckgrnd(hermit);
+        throwFloor(direction.woodBlade());
     }
 
     public void wall() { so.println("The cave blocks your way."); }
@@ -1434,14 +1481,24 @@ class Room20 extends Room {
     }
 
     public void optional() {
-        if(down.closed) {
-            so.println("That suspicious Gate is locked, only a special key can open it.");
-        }
-        if(itemNum == 1) {
-            so.printf("A %s is just laying there on the ground.\n", toString());
-        }
-        else if (itemNum > 1){
-            so.printf("%s litter the floor.", toString());
+        if(down.closed) {so.println("A malevolent miasma keeps you from approaching the Gate. There might be a magical artifact that can dispel it.");}
+        else { so.println("The Talisman has exorcised the dark aura. You can now go Down."); }
+        if(itemNum == 1) {so.printf("A %s is just laying there on the ground.\n", this);}
+        else if (itemNum > 1){so.printf("%s litter the floor.\n", this);}
+    }
+
+    public void radioactive(Player player){
+        Locked temp = (Locked)down;
+        for(int i = 0; i < player.possess; i++){
+            if(player.holding[i].name == temp.unlock.name){
+                down.traverse = true;
+                down.closed = false;
+                break;
+            }
+            else {
+                down.traverse = false;
+                down.closed = true;
+            }
         }
     }
 
@@ -1453,7 +1510,7 @@ class Room20 extends Room {
         south = direction.createDoor(room10);
         east = direction.createDoor(room17);
         west = direction.createDoor(room6);
-        down = direction.createLock(boss);
+        down = direction.createLock(boss, direction.dungeonKey());
     }
 }
 
@@ -1463,29 +1520,35 @@ class BossRoom extends Room {
     BossRoom(PathFactory direction) {
         super(direction);
         name = "Boss Lair";
-        descrip = "Here lies the throne room of Qanon: Bringer of Calamity.\n" + "The only escape is back Up through the ceiling.";
+        descrip = "Here lies the throne room of Qanon: Bringer of Calamity.\n" + "The only escape is Up through the ceiling.";
         qanon = direction.spawnQanon();
         addBckgrnd(qanon);
     }
 
     public void optional() {
         if(qanon.firstForm) {
-            so.println("Qanon waits in front of you, an apparition of what was once a human king.");
+            so.println("Qanon waits in front of you, an apparition of what was once a human king.\n"
+                    + "Strike true! Do not falter!");
         }
         else if(qanon.secForm) {
             qanon.weakness = new HighShield();
-            so.println("Qanon takes on a new form, one resembling that of a monstrous boar.");
+            so.println("Qanon takes on a new form, one resembling that of a monstrous boar.\n"
+                    + "It looks ready to charge. Defend yourself!");
         }
         else if(qanon.finalForm) {
             qanon.weakness = new QuadForce();
-            so.println("This is Qanon's true form: a nightmare creature dripping darkness.");
+            so.println("This is Qanon's true form: a nightmare creature dripping darkness.\n"
+                    + "Seal away the darkness once and for all!");
         }
+
+        if(itemNum == 1) {so.printf("A %s is just laying there on the ground.\n", this);}
+        else if (itemNum > 1){so.printf("%s litter the floor.\n", this);}
     }
 
     public void wall() { so.println("YOU SHALL NOT PASS!!!"); }
     public void pathway(Room1 room1, Room2 room2, Room3 room3, Room4 room4, Room5 room5, Room6 room6, Room7 room7,
                         Room8 room8, Room9 room9, Room10 room10, Room11 room11, Room12 room12, Room13 room13, Room14 room14,
                         Room15 room15, Room16 room16, Room17 room17, Room18 room18, Room19 room19, Room20 room20, BossRoom boss) {
-        up = direction.createLock(room20);
+        up = direction.createDoor(room20);
     }
 }
